@@ -22,6 +22,8 @@ from urllib.request import urlopen, Request
 import requests
 import config
 from plotly.subplots import make_subplots
+import json
+import api_data
 
 # Intialize the app
 app = Dash(__name__,external_stylesheets=dbc.themes.DARKLY)
@@ -66,7 +68,7 @@ fig = go.Figure()
 
 fig = make_subplots(rows=4, cols=1, shared_xaxes=True,
                     vertical_spacing=0.01, 
-                    row_heights=[0.5,0.1,0.2,0.2])
+                    row_heights=[0.7,0.15,0.15,0.15])
 # Candlestick Chart
 fig.add_trace(go.Candlestick(x=df.index,
                              open=df['Open'],
@@ -126,7 +128,7 @@ fig.add_trace(go.Scatter(x=df.index,
                         ), row=4, col=1)
 
 # update layout by changing the plot size, hiding legends & rangeslider, and removing gaps between dates
-fig.update_layout(height=900, width=1200, 
+fig.update_layout(height=700, width=950, 
                   showlegend=False, 
                   xaxis_rangeslider_visible=False)
 
@@ -159,6 +161,21 @@ fig.update_layout(
 ))
 
 fig.update_xaxes(matches='x')
+
+#table data
+
+response = requests.get(f'https://financialmodelingprep.com/api/v3/quote-short/{stock}?apikey={config.api}')
+real_time_data = response.json()
+
+# Use json_normalize to convert JSON data to a df
+real_time_df = pd.json_normalize(real_time_data)
+price = real_time_df.iloc[0,1]
+
+
+#table of ratios
+fig.add_trace(go.Table(header=dict(values=[f'Summary {stock} Structure', 'Values']),
+                 cells=dict(values=[['Current Price', 'Current Mkt Cap', 'EPS', 'ROA', 'ROE','Price Earnings','Dividend Yield', 'Revenue','Revenue Per Share'], [price, api_data.mkt_cap[0], api_data.eps[0], api_data.roa[0], api_data.roe[0], api_data.pe[0],api_data.div_yld[0],api_data.rev[0], api_data.rps[0]]]))
+                     )
 
 fig.show()
 
