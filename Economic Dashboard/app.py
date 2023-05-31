@@ -128,9 +128,15 @@ fig.add_trace(go.Scatter(x=df.index,
                         ), row=4, col=1)
 
 # update layout by changing the plot size, hiding legends & rangeslider, and removing gaps between dates
-fig.update_layout(height=700, width=950, 
+
+# added paper_gbcolor, font_color,margin, and autosize
+fig.update_layout(paper_gbcolor='black',
+                  font_color='grey',
+                  margin=dict(l=10,r=10,b=5,t=5),
+                  height=700, width=950, 
                   showlegend=False, 
-                  xaxis_rangeslider_visible=False)
+                  xaxis_rangeslider_visible=False,
+                  autosize=False)
 
 # Make the title dynamic to reflect whichever stock we are analyzing
 fig.update_layout(
@@ -144,8 +150,9 @@ fig.update_yaxes(title_text="Volume", row=2, col=1)
 fig.update_yaxes(title_text="MACD", showgrid=False, row=3, col=1)
 fig.update_yaxes(title_text="Stoch", row=4, col=1)
 
-
-fig.update_layout(
+# stock table of info
+fig2 = go.Figure()
+fig2.update_layout(
     xaxis=dict(
     rangeslider_visible=False,
     rangeselector_visible=True,
@@ -160,7 +167,7 @@ fig.update_layout(
     )
 ))
 
-fig.update_xaxes(matches='x')
+fig2.update_xaxes(matches='x')
 
 #table data
 
@@ -173,8 +180,9 @@ price = real_time_df.iloc[0,1]
 
 
 #table of ratios
-fig.add_trace(go.Table(header=dict(values=[f'Summary {stock} Structure', 'Values']),
-                 cells=dict(values=[['Current Price', 'Current Mkt Cap', 'EPS', 'ROA', 'ROE','Price Earnings','Dividend Yield', 'Revenue','Revenue Per Share'], [price, api_data.mkt_cap[0], api_data.eps[0], api_data.roa[0], api_data.roe[0], api_data.pe[0],api_data.div_yld[0],api_data.rev[0], api_data.rps[0]]]))
+fig2.add_trace(go.Table(header=dict(values=[f'Summary {stock} Structure', 'Values']),
+                 cells=dict(values=[['Current Price', 'Current Mkt Cap', 'EPS', 'ROA', 'ROE','Price Earnings','Dividend Yield', 'Revenue','Revenue Per Share'],
+                                    [price, api_data.mkt_cap[0], api_data.eps[0], api_data.roa[0], api_data.roe[0], api_data.pe[0],api_data.div_yld[0],api_data.rev[0], api_data.rps[0]]]))
                      )
 
 fig.show()
